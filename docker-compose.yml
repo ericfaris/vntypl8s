@@ -14,9 +14,9 @@ services:
       - no-new-privileges:true
     # Host-side binding stays on 127.0.0.1 — a Cloudflare Tunnel is the only
     # public entry point. Container listens on 3001 (see Dockerfile / PORT).
-    # 8900 was the free port identified in the brief; it is a suggestion.
+    # 8900 was already taken by music-trivia at deploy time; 8901 is free.
     ports:
-      - "127.0.0.1:8900:3001"
+      - "127.0.0.1:8901:3001"
     environment:
       # Only used by the OFFLINE card-generation CLI (npm run gen:cards).
       # The running server never calls the Anthropic API.
