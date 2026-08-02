@@ -1,0 +1,32 @@
+# Project name fixes the container name to vntypl8s-app-1 regardless of the
+# directory the compose file lives in.
+name: vntypl8s
+
+services:
+  app:
+    build: .
+    image: ericfaris/vntypl8s:latest
+    restart: unless-stopped
+    # Run as the host user (uid:gid 1000) so nothing runs as root.
+    user: "1000:1000"
+    # Block privilege escalation (setuid binaries can't gain new privs).
+    security_opt:
+      - no-new-privileges:true
+    # Host-side binding stays on 127.0.0.1 — a Cloudflare Tunnel is the only
+    # public entry point. Container listens on 3001 (see Dockerfile / PORT).
+    # 8900 was the free port identified in the brief; it is a suggestion.
+    ports:
+      - "127.0.0.1:8900:3001"
+    environment:
+      # Only used by the OFFLINE card-generation CLI (npm run gen:cards).
+      # The running server never calls the Anthropic API.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - ANTHROPIC_MODEL=${ANTHROPIC_MODEL:-claude-sonnet-4-5}
+      # HTTP/WebSocket port inside the container (matches the Dockerfile EXPOSE).
+      - PORT=3001
+      # Google Cast custom receiver app id — read from .env. Unset is fine:
+      # the app runs normally and the Cast button simply doesn't render.
+      - CAST_RECEIVER_APP_ID=${CAST_RECEIVER_APP_ID:-}
+      # Base URL used to build the QR join link shown on the TV. Must be the
+      # real public host in production so players scan a QR that resolves.
+      - PUBLIC_BASE_URL=${PUBLIC_BASE_URL:-https://vntypl8s.mooseflip.com}

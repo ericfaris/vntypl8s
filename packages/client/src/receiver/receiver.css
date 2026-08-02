@@ -1,0 +1,391 @@
+/* ==========================================================================
+   TV receiver stylesheet — HAND-WRITTEN PLAIN CSS ONLY.
+
+   Physical Chromecast hardware runs an old embedded Chrome (Chrome 86 class
+   observed in production). Chromecast guide §3.7: the following silently
+   no-op on the device while looking perfect in desktop `?dev` mode, so they
+   are BANNED in this file:
+
+     - @layer at-rules            (needs Chrome 99+)
+     - oklch() / lab() colours    (needs Chrome 111+)
+     - logical properties         (padding-inline, inset, margin-block, …)
+     - aspect-ratio, :is(), :where(), container queries, nesting
+
+   Use rgb()/hsl()/hex and physical longhands (padding-left/padding-right,
+   top/right/bottom/left). Size in vw/vh. Do not import a CSS framework here.
+   Desktop ?dev mode will NOT catch a violation — it renders fine in modern
+   Chrome. Review by reading, not by looking.
+   ========================================================================== */
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+
+body {
+  background-color: #10141c;
+  background-image: linear-gradient(180deg, #1a2130 0%, #10141c 100%);
+  color: #eef2f8;
+  font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.tv {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  padding-top: 3vh;
+  padding-bottom: 3vh;
+  padding-left: 4vw;
+  padding-right: 4vw;
+  display: flex;
+  flex-direction: column;
+  gap: 2vh;
+}
+
+.tv-center {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+.tv-center-text {
+  text-align: center;
+}
+
+.tv-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vh;
+}
+
+.tv-spread {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tv-grow {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tv-brand {
+  font-size: 2.2vw;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffc233;
+}
+
+.tv-muted {
+  color: #93a0b5;
+  font-size: 1.8vw;
+}
+
+.tv-join {
+  font-size: 2vw;
+}
+
+.tv-error {
+  color: #e0554b;
+  font-size: 1.4vw;
+  margin-top: 2vh;
+}
+
+.tv-code {
+  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  font-size: 9vw;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: #ffffff;
+}
+
+.tv-qr {
+  background-color: #ffffff;
+  padding: 1vw;
+  border-radius: 1vw;
+  border: 0.3vw solid #0d1420;
+}
+.tv-qr img {
+  display: block;
+  width: 22vw;
+  height: 22vw;
+}
+
+.tv-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2vw;
+}
+.tv-pchip {
+  font-size: 1.7vw;
+  padding-top: 0.6vh;
+  padding-bottom: 0.6vh;
+  padding-left: 1.4vw;
+  padding-right: 1.4vw;
+  border-radius: 4vw;
+  border: 0.2vw solid #3a465c;
+  background-color: #1e2635;
+}
+
+/* -------------------------------- writing phase ------------------------- */
+.tv-timer {
+  font-size: 5vw;
+  font-weight: 800;
+  color: #ffffff;
+}
+.tv-timer.warn {
+  color: #ffb020;
+}
+
+.tv-writegrid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  overflow: hidden;
+}
+.tv-writerow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 1.2vh;
+  padding-bottom: 1.2vh;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  border-radius: 1vw;
+  border: 0.2vw solid #3a465c;
+  background-color: #1a2130;
+}
+.tv-writerow.done {
+  border-color: #3fbf72;
+}
+.tv-writename {
+  font-size: 2.2vw;
+  font-weight: 700;
+  width: 30%;
+}
+.tv-writestatus {
+  font-size: 1.6vw;
+  color: #93a0b5;
+  width: 20%;
+  text-align: right;
+}
+.tv-dots {
+  display: flex;
+  gap: 0.8vw;
+}
+.tv-dot {
+  display: block;
+  width: 1.4vw;
+  height: 1.4vw;
+  border-radius: 1vw;
+  border: 0.2vw solid #3a465c;
+  background-color: transparent;
+}
+.tv-dot.on {
+  background-color: #ffc233;
+  border-color: #ffc233;
+}
+
+/* -------------------------------- guessing ------------------------------ */
+.tv-center-block {
+  display: flex;
+  justify-content: center;
+}
+
+.tv-plate {
+  display: inline-block;
+  background-color: #f4f3ee;
+  border: 0.4vw solid #0d1420;
+  border-radius: 1vw;
+  padding-top: 1.2vh;
+  padding-bottom: 1.2vh;
+  padding-left: 1.6vw;
+  padding-right: 1.6vw;
+}
+.tv-plate-inner {
+  display: flex;
+  gap: 0.5vw;
+}
+.tv-plate-char {
+  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  font-size: 7vw;
+  font-weight: 800;
+  color: #16202e;
+  line-height: 1.05;
+}
+.tv-plate-char.dim {
+  color: #b9b6ab;
+}
+
+.tv-prompt {
+  text-align: center;
+  font-size: 2vw;
+  color: #93a0b5;
+}
+
+.tv-reveal {
+  text-align: center;
+  border: 0.25vw solid #ffc233;
+  border-radius: 1vw;
+  padding-top: 1.2vh;
+  padding-bottom: 1.2vh;
+  padding-left: 2vw;
+  padding-right: 2vw;
+  background-color: #21283a;
+}
+.tv-reveal-title {
+  font-size: 2.6vw;
+  font-weight: 800;
+  color: #ffc233;
+}
+.tv-reveal-card {
+  font-size: 3.4vw;
+  font-weight: 800;
+}
+.tv-reveal-sub {
+  font-size: 1.5vw;
+  color: #93a0b5;
+}
+
+.tv-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1vw;
+  overflow: hidden;
+}
+.tv-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.5vw;
+  font-weight: 700;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  padding-left: 0.6vw;
+  padding-right: 0.6vw;
+  border-radius: 0.8vw;
+  border: 0.2vw solid #3a465c;
+  background-color: #1e2635;
+}
+.tv-card.scored {
+  opacity: 0.35;
+  border-color: #3fbf72;
+  text-decoration: line-through;
+}
+.tv-card.discarded {
+  opacity: 0.2;
+  text-decoration: line-through;
+}
+
+/* -------------------------------- scoreboard ---------------------------- */
+.tv-scores {
+  display: flex;
+  gap: 1vw;
+  flex-wrap: wrap;
+}
+.tv-score {
+  flex: 1 1 auto;
+  text-align: center;
+  padding-top: 1vh;
+  padding-bottom: 1vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  border-radius: 0.8vw;
+  border: 0.2vw solid #3a465c;
+  background-color: #1a2130;
+}
+.tv-score.active {
+  border-color: #ffc233;
+}
+.tv-score-name {
+  display: block;
+  font-size: 1.5vw;
+  color: #93a0b5;
+}
+.tv-score-total {
+  display: block;
+  font-size: 3vw;
+  font-weight: 800;
+}
+.tv-score-sub {
+  display: block;
+  font-size: 1.1vw;
+  color: #93a0b5;
+}
+
+/* -------------------------------- recap --------------------------------- */
+.tv-recap {
+  display: flex;
+  flex-direction: column;
+  gap: 1vh;
+  overflow: hidden;
+}
+.tv-recaprow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.8vw;
+  padding-top: 0.8vh;
+  padding-bottom: 0.8vh;
+  padding-left: 1.5vw;
+  padding-right: 1.5vw;
+  border-radius: 0.8vw;
+  background-color: #1a2130;
+}
+.tv-recapname {
+  font-weight: 700;
+  width: 30%;
+}
+.tv-recapcard {
+  color: #ffc233;
+  width: 40%;
+  text-align: center;
+}
+.tv-recapwho {
+  color: #93a0b5;
+  width: 30%;
+  text-align: right;
+}
+
+/* -------------------------------- chrome -------------------------------- */
+.tv-version {
+  position: fixed;
+  bottom: 1vh;
+  right: 1vw;
+  font-size: 1vw;
+  color: #93a0b5;
+  opacity: 0.5;
+}
+
+.tv-debug {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  max-height: 40vh;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.82);
+  color: #d8f0d8;
+  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  font-size: 1.1vw;
+  padding-top: 0.5vh;
+  padding-bottom: 0.5vh;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  z-index: 9999;
+}
+.tv-debug-line {
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+.tv-debug-line.warn {
+  color: #ffd27f;
+}
+.tv-debug-line.error {
+  color: #ff9b90;
+}

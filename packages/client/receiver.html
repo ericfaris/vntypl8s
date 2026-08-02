@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VNTYPL8S — TV</title>
+    <link rel="icon" href="/favicon.ico" />
+    <script src="//www.gstatic.com/cast/sdk/libs/caf_receiver/v3/cast_receiver_framework.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!--
+      ORDERING IS LOAD-BEARING — do not "tidy" this file.
+
+      A `<script type="module">` is deferred by spec: it runs only after the
+      parser finishes. The plain inline `<script>` blocks BELOW it therefore
+      execute FIRST, while the React module is still loading. That is what
+      satisfies Chromecast guide §3.1: CastReceiverContext, the custom-message
+      listener and ctx.start() must all be live before any framework mounts.
+
+      Do NOT move CAF init into main.tsx or a useEffect. A SENDER_CONNECTED or
+      an early SYNC_ROOM that arrives before the listener exists is silently
+      dropped, and it fails only on real hardware.
+    -->
+    <script type="module" src="/src/receiver/main.tsx"></script>
+
+    <script>
+      // ------------------------------------------------------- CAF boot block
+      window.__castPending = null;
+      window.__castInitError = null;
+      window.__vpDebug = false;
+      (function () {
+        try {
+          var params = new URLSearchParams(window.location.search);
+          if (params.has('dev')) {
+            // Desktop stub mode (guide §6): skip window.cast entirely.
+            window.__castInitError = null;
+            window.__castDevMode = true;
+            return;
+          }
+          if (!window.cast || !window.cast.framework || !window.cast.framework.CastReceiverContext) {
+            window.__castInitError = 'Cast SDK not available on window';
+            return;
+          }
+
+          // MUST match CAST_NAMESPACE in packages/shared/src/protocol.ts
+          // character for character (guide §2.5 — namespace drift is silent).
+          var NS = 'urn:x-cast:com.mooseflip.vntypl8s.v1';
+          var ctx = cast.framework.CastReceiverContext.getInstance();
+
+          // getPlayerManager() must be obtained BEFORE ctx.start() in CAF.
+          var pm = ctx.getPlayerManager();
+          // We play no audio, but a DOM-attached <audio> element keeps CAF's
+          // media session happy and costs nothing (guide §3.6).
+          var audio = document.createElement('audio');
+          audio.setAttribute('aria-hidden', 'true');
+          document.body.appendChild(audio);
+          pm.setMediaElement(audio);
+
+          function reply(senderId, msg) {
+            try {
+              // NEVER JSON.stringify here — sendCustomMessage auto-serializes
+              // and double-encoding hands the sender a string (guide §3.4).
+              ctx.sendCustomMessage(NS, senderId, msg);
+            } catch (e) {
+              /* sender already gone */
+            }
+          }
+
+          ctx.addCustomMessageListener(NS, function (e) {
+            var senderId = e && e.senderId;
+            var d = e && e.data;
+            // Accept both object and string payloads (guide §3.4).
+            try {
+              if (typeof d === 'string') d = JSON.parse(d);
+            } catch (err) {
+              reply(senderId, { type: 'ERROR', code: 'INVALID_PAYLOAD', message: 'unparseable' });
+              return;
+            }
+            if (!d || typeof d !== 'object' || typeof d.type !== 'string') {
+              reply(senderId, { type: 'ERROR', code: 'INVALID_PAYLOAD', message: 'no type' });
+              return;
+            }
+
+            if (d.type === 'PING') {
+              // No-op. Its only job is keeping the Cast session clock alive.
+              return;
+            }
+
+            if (d.type === 'TOGGLE_DEBUG') {
+              window.__vpDebug = !window.__vpDebug;
+              if (window.__vpOnDebugToggle) window.__vpOnDebugToggle();
+              return;
+            }
+
+            if (d.type !== 'SYNC_ROOM') {
+              reply(senderId, { type: 'ERROR', code: 'INVALID_PAYLOAD', message: 'unknown type' });
+              return;
+            }
+
+            // --- field-by-field validation (guide §3.3) ---
+            if (typeof d.roomCode !== 'string' || !/^\d{4}$/.test(d.roomCode)) {
+              reply(senderId, { type: 'ERROR', code: 'INVALID_PAYLOAD', message: 'roomCode' });
+              return;
+            }
+            if (typeof d.token !== 'string' || d.token.length < 16) {
+              reply(senderId, { type: 'ERROR', code: 'INVALID_PAYLOAD', message: 'token' });
+              return;
+            }
+            try {
+              var u = new URL(d.apiBaseUrl);
+              if (u.protocol !== 'http:' && u.protocol !== 'https:') throw new Error('proto');
+            } catch (err) {
+              reply(senderId, { type: 'ERROR', code: 'INVALID_PAYLOAD', message: 'apiBaseUrl' });
+              return;
+            }
+
+            var pending = { roomCode: d.roomCode, token: d.token, senderId: senderId };
+            window.__castPending = pending;
+            if (window.__castOnSync) {
+              // main.tsx installs this and calls back with the result so we
+              // only ack a subscribe that actually succeeded.
+              window.__castOnSync(pending.roomCode, pending.token, function (ok, code) {
+                if (ok) reply(senderId, { type: 'SYNCED', roomCode: pending.roomCode });
+                else
+                  reply(senderId, {
+                    type: 'ERROR',
+                    code: code || 'BACKEND_UNREACHABLE',
+                    message: 'subscribe failed',
+                  });
+              });
+            }
+            // If React hasn't mounted yet, main.tsx drains __castPending on
+            // boot and acks from there.
+          });
+
+          // BOTH options, per guide §3.2. disableIdleTimeout kills CAF's
+          // media idle timer (we have no media); maxInactivity still bounds
+          // how long a genuinely dead sender can hold the session.
+          ctx.start({ disableIdleTimeout: true, maxInactivity: 3600 });
+        } catch (err) {
+          window.__castInitError = String(err);
+        }
+      })();
+    </script>
+
+    <script>
+      // ------------------------------- HTTP fallback for code delivery ------
+      // Belt to the Cast channel's braces (guide §5). Poll /api/cast/pending
+      // until a code shows up. store.receiverSubscribe() clears this timer the
+      // moment a subscribe succeeds — a redirect here reloads the page, which
+      // is a REAL socket disconnect for the TV, and must never land on top of
+      // a session that is already live.
+      (function () {
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('code')) return; // already have a code
+        window.__castPollTimer = setInterval(function () {
+          if (window.__castPending) {
+            clearInterval(window.__castPollTimer);
+            window.__castPollTimer = undefined;
+            return;
+          }
+          fetch('/api/cast/pending', { cache: 'no-store' })
+            .then(function (r) {
+              return r.json();
+            })
+            .then(function (d) {
+              if (!d || !d.code || !d.token) return;
+              if (window.__castPending) return;
+              window.__castPending = { roomCode: d.code, token: d.token };
+              if (window.__castOnSync) window.__castOnSync(d.code, d.token);
+            })
+            .catch(function () {});
+        }, 2000);
+      })();
+    </script>
+  </body>
+</html>

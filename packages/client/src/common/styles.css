@@ -1,0 +1,341 @@
+/* Player-facing styles. The phone is a modern browser, so modern CSS is fine
+   here. The TV receiver has its own restricted stylesheet (receiver.css) —
+   Chromecast hardware runs a Chrome 86-class engine. Do not merge the two. */
+
+:root {
+  /* Highway signage: reflective plate white, road-sign green, amber, asphalt */
+  --bg: #10141c;
+  --bg-2: #1a2130;
+  --panel: #1e2635;
+  --panel-2: #27314400;
+  --text: #eef2f8;
+  --muted: #93a0b5;
+  --line: #3a465c;
+  --accent: #ffc233;
+  --accent-2: #2f8f5b;
+  --good: #3fbf72;
+  --bad: #e0554b;
+  --warn: #ffb020;
+  --plate-bg: #f4f3ee;
+  --plate-ink: #16202e;
+  --plate-edge: #0d1420;
+  --font-plate: "DejaVu Sans Mono", "SF Mono", Menlo, Consolas, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(1200px 800px at 50% -20%, var(--bg-2), var(--bg));
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 2px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  padding: 12px 16px;
+  border-radius: 10px;
+  transition: transform 0.06s ease, background 0.15s ease, opacity 0.15s;
+}
+button:hover:not(:disabled) {
+  background: #2a3548;
+}
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+button.primary {
+  background: var(--accent);
+  border-color: #d99b00;
+  color: #201803;
+  font-weight: 700;
+}
+button.primary:hover:not(:disabled) {
+  background: #ffcf5c;
+}
+button.good {
+  background: var(--accent-2);
+  border-color: #1f6b41;
+  color: #f2fff7;
+  font-weight: 600;
+}
+button.ghost {
+  background: transparent;
+}
+
+input {
+  font: inherit;
+  background: #131a26;
+  color: var(--text);
+  border: 2px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  width: 100%;
+}
+input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.app {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 20px 16px 60px;
+  min-height: 100%;
+}
+.center {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+}
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.spread {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+.wrap {
+  flex-wrap: wrap;
+}
+.grow {
+  flex: 1;
+}
+.muted {
+  color: var(--muted);
+}
+.small {
+  font-size: 0.85rem;
+}
+.center-text {
+  text-align: center;
+}
+
+.card {
+  background: var(--panel);
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 18px;
+}
+.title {
+  font-family: var(--font-plate);
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+.h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+.banner {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #3a2320;
+  color: #ffd9d4;
+  border: 2px solid var(--bad);
+}
+.notice {
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #141b27;
+  border: 2px dashed var(--line);
+}
+.code-big {
+  font-family: var(--font-plate);
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+}
+
+/* ------------------------------- licence plate ------------------------- */
+.plate {
+  display: inline-block;
+  background: var(--plate-bg);
+  border: 3px solid var(--plate-edge);
+  border-radius: 8px;
+  padding: 8px 10px;
+  box-shadow: inset 0 0 0 2px #c9c6ba;
+}
+.plate-inner {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+.plate-char {
+  font-family: var(--font-plate);
+  font-weight: 800;
+  color: var(--plate-ink);
+  min-width: 0.72em;
+  text-align: center;
+}
+.plate-char.empty {
+  color: transparent;
+  border-bottom: 3px solid #bcb9ad;
+}
+.plate-char.empty::after {
+  content: "\00a0";
+}
+.plate-sm .plate-char {
+  font-size: 1.1rem;
+}
+.plate-md .plate-char {
+  font-size: 1.7rem;
+}
+.plate-lg .plate-char {
+  font-size: 2.6rem;
+}
+
+/* ------------------------------- tile picker --------------------------- */
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+.tiles.digits {
+  grid-template-columns: repeat(5, 1fr);
+}
+.tile {
+  font-family: var(--font-plate);
+  font-size: 1.15rem;
+  font-weight: 700;
+  padding: 12px 0;
+  border-radius: 8px;
+  background: #26303f;
+  border: 2px solid var(--line);
+}
+.tile:disabled {
+  opacity: 0.25;
+}
+.tilelabel {
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* ------------------------------- misc ---------------------------------- */
+.timer {
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+}
+.timer.warn {
+  color: var(--warn);
+}
+.timer.over {
+  color: var(--bad);
+}
+
+.pchip {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 2px solid var(--line);
+  background: var(--panel);
+  font-size: 0.9rem;
+}
+.pchip.active {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.pchip.offline {
+  opacity: 0.45;
+}
+
+.scorechip {
+  display: inline-flex;
+  gap: 6px;
+  align-items: baseline;
+}
+
+.ownercard {
+  background: linear-gradient(160deg, #2b3450, #223047);
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+}
+.ownercard .label {
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ownercard .value {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-top: 4px;
+}
+
+.reqcard {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+.reqchar {
+  font-family: var(--font-plate);
+  font-weight: 800;
+  font-size: 1.2rem;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #26303f;
+  border: 2px solid var(--line);
+}
+.met {
+  color: var(--good);
+  font-weight: 700;
+}
+.notmet {
+  color: var(--muted);
+}
+
+.awardlist {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.awardlist button {
+  text-align: left;
+  font-size: 1.05rem;
+}
+
+.standings {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.standing {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: #182031;
+  border: 2px solid var(--line);
+}
+.standing.winner {
+  border-color: var(--accent);
+}

@@ -1,0 +1,24 @@
+{
+  "name": "vntypl8s",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Online multiplayer + Chromecast adaptation of the VNTYPL8S party game",
+  "workspaces": [
+    "packages/shared",
+    "packages/server",
+    "packages/client"
+  ],
+  "scripts": {
+    "build": "npm run build -w @vntypl8s/shared && npm run build -w @vntypl8s/client && npm run build -w @vntypl8s/server",
+    "dev": "concurrently -n server,client -c blue,green \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "npm run dev -w @vntypl8s/server",
+    "dev:client": "npm run dev -w @vntypl8s/client",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "gen:cards": "npm run gen:cards -w @vntypl8s/server --"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0",
+    "typescript": "^5.7.2"
+  }
+}
