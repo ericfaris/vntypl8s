@@ -241,6 +241,13 @@ export function attachSocketServer(
       const graceTimer = setTimeout(() => {
         runtime.disconnectGraceTimers.delete(playerId);
         if (rooms.get(code) !== runtime) return; // room was replaced/closed meanwhile
+        // A reconnect commonly opens a NEW socket (backgrounded tab resumes,
+        // flaky mobile network) before this stale socket's own disconnect
+        // event has fired. If another live socket already represents this
+        // player, they never actually left — don't pause the game out from
+        // under them.
+        const stillRepresented = [...runtime.sockets.values()].includes(playerId);
+        if (stillRepresented) return;
         runtime.engine.disconnect(playerId);
         if (rooms.closeIfEmpty(code)) console.log(`[room] ${code} closed (empty)`);
         else broadcast(runtime);
