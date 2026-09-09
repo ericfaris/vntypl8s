@@ -8,6 +8,8 @@ import {
 } from '@vntypl8s/shared';
 import { store } from '../common/store.js';
 import { PlateDisplay } from '../common/ui.js';
+import { Paperclip } from '../common/stickers.js';
+import { sound } from '../common/sound.js';
 
 /**
  * The tile picker IS the enforcement mechanism for the mechanical Plate
@@ -34,11 +36,13 @@ export function PlateWriter({ priv }: { priv: PrivateState }) {
 
   function push(ch: string) {
     if (full) return;
+    sound.playSfx('tile-tap');
     const next = plate + ch;
     setPlate(next);
     void store.setPlate(next);
   }
   function backspace() {
+    sound.playSfx('tile-tap');
     const next = plate.slice(0, -1);
     setPlate(next);
     void store.setPlate(next);
@@ -50,12 +54,14 @@ export function PlateWriter({ priv }: { priv: PrivateState }) {
   async function submit() {
     setBusy(true);
     const ok = await store.submitPlate();
+    if (ok) sound.playSfx('plate-submit');
     if (!ok) setBusy(false);
   }
 
   return (
     <div className="stack">
       <div className="ownercard">
+        <Paperclip />
         <div className="label">Your Owner card</div>
         <div className="value">{priv.ownerCard?.title ?? '—'}</div>
       </div>

@@ -113,8 +113,8 @@ export default function App() {
   if (!pub) {
     const castError = (window as unknown as { __castInitError?: string | null }).__castInitError;
     content = (
-      <div className="tv tv-center">
-        <div className="tv-brand">VNTYPL8S</div>
+      <div className="tv tv-center tv-lobby-bg">
+        <img className="tv-logo" src="/brand/logo.png" alt="VNTYPL8S" />
         <div className="tv-muted">Waiting for a room…</div>
         {castError && <div className="tv-error">Cast init error: {castError}</div>}
       </div>
@@ -152,8 +152,8 @@ function LobbyTV({ pub, baseUrl }: { pub: PublicRoom; baseUrl: string }) {
   }, [baseUrl, pub.code]);
 
   return (
-    <div className="tv">
-      <div className="tv-brand">VNTYPL8S</div>
+    <div className="tv tv-lobby-bg">
+      <img className="tv-logo" src="/brand/logo.png" alt="VNTYPL8S" />
       <div className="tv-spread tv-grow">
         <div className="tv-stack tv-center-text">
           <div className="tv-muted tv-join">
@@ -295,7 +295,7 @@ function RoundEndTV({ pub }: { pub: PublicRoom }) {
 function GameOverTV({ pub }: { pub: PublicRoom }) {
   const winners = pub.winnerPlayerIds.map((id) => nameOf(pub, id));
   return (
-    <div className="tv tv-center">
+    <div className="tv tv-center tv-gameover-bg">
       <div className="tv-brand">Final</div>
       <div className="tv-code">
         {winners.length === 0

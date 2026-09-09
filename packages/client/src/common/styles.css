@@ -339,3 +339,71 @@ input:focus {
 .standing.winner {
   border-color: var(--accent);
 }
+
+/* ------------------------------- brand / delight ------------------------ */
+.brand-logo {
+  display: block;
+  width: 82%;
+  max-width: 320px;
+  margin: 0 auto;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.45));
+}
+
+.stickerfield {
+  position: relative;
+}
+.sticker {
+  position: absolute;
+  width: 46px;
+  height: 46px;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
+}
+.sticker.tl {
+  top: -14px;
+  left: -10px;
+  transform: rotate(-14deg);
+}
+.sticker.tr {
+  top: -18px;
+  right: -8px;
+  transform: rotate(11deg);
+}
+.sticker.br {
+  bottom: -12px;
+  right: 6%;
+  transform: rotate(8deg);
+}
+
+.gameover-card {
+  background-image: linear-gradient(180deg, rgba(16, 20, 28, 0.35), rgba(16, 20, 28, 0.85)),
+    url("/brand/bg-gameover.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.mutebtn {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+/* ------------------------------- paperclip flourish ---------------------- */
+.ownercard {
+  position: relative;
+  overflow: visible;
+}
+.paperclip {
+  position: absolute;
+  top: -10px;
+  left: 14px;
+  width: 26px;
+  height: 34px;
+  transform: rotate(-18deg);
+  pointer-events: none;
+}

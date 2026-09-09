@@ -125,6 +125,35 @@ Chrome and silently no-ops on the device. Review this file by reading it.
 
 ---
 
+## Assets
+
+`packages/client/public/brand/` and `packages/client/public/audio/` hold the
+game's visual and audio identity — one-time AI-generated assets shipped as
+static files, the same pattern as the curated card decks above:
+
+- `brand/logo.png` — the chrome VNTYPL8S wordmark badge (player app header,
+  TV lobby/idle screens, and the source for `favicon.ico`).
+- `brand/bg-lobby.jpg`, `brand/bg-gameover.jpg` — full-bleed TV backgrounds
+  for the receiver's lobby and game-over screens.
+- `audio/sfx/*.mp3` — short UI sounds (tile tap, plate submit, reveal,
+  correct/wrong guess, timer tick, round-end and game-over fanfares), played
+  from `packages/client/src/common/sound.ts` and muted per-device via the
+  🔊/🔇 button (`localStorage`, never game state).
+- `audio/speech/*.mp3` — four pre-recorded announcer lines (round 1/2/3 start,
+  game over). Static and generic by design — no player names — so they don't
+  need runtime generation.
+
+The TV receiver stays silent by design (see the CAF boot block in
+`receiver.html`): all sound lives in the player app, since every effect here
+follows a tap on the phone that triggered it (or a phase change that arrived
+moments after one), which is what satisfies browser autoplay policies.
+
+The bumper-sticker flourishes on the landing/lobby screen
+(`packages/client/src/common/stickers.tsx`) are hand-authored inline SVG, not
+generated images — cheap, crisp at any size, and an easy place to add more.
+
+---
+
 ## Cards
 
 Both decks ship as curated static JSON in `packages/shared/src/data/` and are

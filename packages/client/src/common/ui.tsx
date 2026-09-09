@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { PublicPlayer } from '@vntypl8s/shared';
 import { useGame } from './useGame.js';
+import { sound } from './sound.js';
 
 /** Live clock for countdowns. */
 export function useNow(intervalMs = 250): number {
@@ -12,12 +13,31 @@ export function useNow(intervalMs = 250): number {
   return now;
 }
 
-export function Timer({ deadline, className = '' }: { deadline: number | null; className?: string }) {
+/** `tick` opts into a countdown-beep for the last 5 seconds — only worth
+ * enabling on a timer whose expiry actually ends the current action. */
+export function Timer({
+  deadline,
+  className = '',
+  tick = false,
+}: {
+  deadline: number | null;
+  className?: string;
+  tick?: boolean;
+}) {
   const now = useNow();
   const { serverOffset } = useGame();
-  if (deadline === null) return null;
-  // deadline is a server epoch; reconcile against client clock skew.
-  const remaining = Math.ceil((deadline - (now - serverOffset)) / 1000);
+  const lastTicked = useRef<number | null>(null);
+  const remaining = deadline === null ? null : Math.ceil((deadline - (now - serverOffset)) / 1000);
+
+  useEffect(() => {
+    if (!tick || remaining === null) return;
+    if (remaining > 0 && remaining <= 5 && lastTicked.current !== remaining) {
+      lastTicked.current = remaining;
+      sound.playSfx('timer-tick');
+    }
+  }, [tick, remaining]);
+
+  if (deadline === null || remaining === null) return null;
   const cls = remaining <= 0 ? 'over' : remaining <= 15 ? 'warn' : '';
   return (
     <span className={`timer ${cls} ${className}`}>{remaining <= 0 ? '0s' : `${remaining}s`}</span>
@@ -63,6 +83,22 @@ export function PlateDisplay({
         )}
       </div>
     </div>
+  );
+}
+
+/** Small fixed-position toggle for the SFX/voice-line sound effects. Muting
+ * is a per-device preference (localStorage), not game state. */
+export function MuteButton() {
+  const [muted, setMuted] = useState(sound.isMuted());
+  useEffect(() => sound.subscribe(() => setMuted(sound.isMuted())), []);
+  return (
+    <button
+      className="ghost mutebtn"
+      aria-label={muted ? 'Unmute sound' : 'Mute sound'}
+      onClick={() => sound.toggleMuted()}
+    >
+      {muted ? '🔇' : '🔊'}
+    </button>
   );
 }
 
