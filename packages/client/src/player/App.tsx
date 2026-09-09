@@ -3,6 +3,8 @@ import { useGame } from '../common/useGame.js';
 import { store } from '../common/store.js';
 import { useWakeLock } from '../common/useWakeLock.js';
 import { CastProvider, useCast } from '../common/cast/CastProvider.js';
+import { MuteButton } from '../common/ui.js';
+import { AlienSticker, PawSticker } from '../common/stickers.js';
 import { GameOver, Guessing, Lobby, Paused, RoundEnd, WritePlates } from './screens.js';
 
 type View = 'landing' | 'host' | 'join';
@@ -92,9 +94,12 @@ function Shell({ config }: { config: Config | null }) {
 
   return (
     <div className="app center">
+      <MuteButton />
       <div className="stack" style={{ width: '100%' }}>
-        <div className="center-text stack">
-          <div className="title">VNTYPL8S</div>
+        <div className="center-text stack stickerfield">
+          <AlienSticker className="tl" />
+          <PawSticker className="tr" />
+          <img className="brand-logo" src="/brand/logo.png" alt="VNTYPL8S" />
           <div className="muted">Party game · phones + your TV</div>
         </div>
         {g.error && <ErrorBanner message={g.error} />}
@@ -237,6 +242,7 @@ function InGame() {
 
   return (
     <div className="app stack">
+      <MuteButton />
       {!g.connected && <div className="banner">Reconnecting…</div>}
       {g.error && <ErrorBanner message={g.error} />}
       {pub.phase === 'LOBBY' && (

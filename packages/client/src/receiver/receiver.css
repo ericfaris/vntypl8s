@@ -80,6 +80,29 @@ body {
   color: #ffc233;
 }
 
+.tv-logo {
+  display: block;
+  width: 26vw;
+  max-width: 420px;
+}
+
+/* Full-bleed art behind the lobby / game-over screens. Plain background-image
+   + background-size: cover — no oklch, no @layer, safe on Chrome 86. A dark
+   linear-gradient scrim keeps the white text legible over busy artwork. */
+.tv-lobby-bg {
+  background-image: linear-gradient(180deg, rgba(16, 20, 28, 0.55) 0%, rgba(16, 20, 28, 0.75) 100%),
+    url("/brand/bg-lobby.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.tv-gameover-bg {
+  background-image: linear-gradient(180deg, rgba(16, 20, 28, 0.4) 0%, rgba(16, 20, 28, 0.8) 100%),
+    url("/brand/bg-gameover.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
 .tv-muted {
   color: #93a0b5;
   font-size: 1.8vw;

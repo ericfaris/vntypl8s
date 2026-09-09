@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import {
   MAX_PLAYERS,
   MIN_PLAYERS,
@@ -7,6 +8,8 @@ import {
 } from '@vntypl8s/shared';
 import { store } from '../common/store.js';
 import { PlateDisplay, PlayerChip, ScoreChip, Timer } from '../common/ui.js';
+import { AlienSticker, Paperclip, PawSticker, Route66Sticker } from '../common/stickers.js';
+import { sound, type SpeechName } from '../common/sound.js';
 import { PlateWriter } from './PlateWriter.js';
 
 const nameOf = (pub: PublicRoom, id: string | null) =>
@@ -48,12 +51,15 @@ export function Lobby({
   const canStart = active.length >= MIN_PLAYERS && active.length <= MAX_PLAYERS;
   return (
     <div className="stack">
-      <div className="card stack center-text">
+      <div className="card stack center-text stickerfield">
+        <AlienSticker className="tl" />
+        <Route66Sticker className="tr" />
         <div className="muted small">Room code</div>
         <div className="code-big">{pub.code}</div>
       </div>
 
-      <div className="card stack">
+      <div className="card stack stickerfield">
+        <PawSticker className="br" />
         <div className="h2">
           Players ({active.length}/{MAX_PLAYERS})
         </div>
@@ -85,8 +91,19 @@ export function Lobby({
 }
 
 // -------------------------------------------------------------- WritePlates
+const ROUND_ANNOUNCE: Record<number, SpeechName> = { 1: 'round1', 2: 'round2', 3: 'round3' };
+
 export function WritePlates({ pub, priv }: { pub: PublicRoom; priv: PrivateState }) {
   const waiting = pub.players.filter((p) => !p.pendingJoin && !p.submitted);
+
+  // This component mounts fresh each time the room enters WRITE_PLATES, i.e.
+  // once per round — a plain mount-effect is enough to announce it once.
+  const roundNumber = pub.round?.roundNumber ?? 1;
+  useEffect(() => {
+    const line = ROUND_ANNOUNCE[roundNumber];
+    if (line) sound.playSpeech(line);
+    // Intentionally mount-only — see the comment above.
+  }, []);
 
   return (
     <div className="stack">
@@ -94,7 +111,7 @@ export function WritePlates({ pub, priv }: { pub: PublicRoom; priv: PrivateState
         <span className="muted small">
           Round {pub.round?.roundNumber ?? 1} of {pub.totalRounds} · Writing
         </span>
-        {pub.timer.enabled && <Timer deadline={pub.timer.phaseDeadline} />}
+        {pub.timer.enabled && <Timer deadline={pub.timer.phaseDeadline} tick />}
       </div>
 
       {priv.pendingJoin ? (
@@ -129,10 +146,30 @@ export function WritePlates({ pub, priv }: { pub: PublicRoom; priv: PrivateState
 // ------------------------------------------------------------------ Guessing
 export function Guessing({ pub, priv }: { pub: PublicRoom; priv: PrivateState }) {
   const round = pub.round;
-  if (!round) return null;
-  const activeId = round.activePlayerId;
+  const activeId = round?.activePlayerId ?? null;
   const isActive = priv.isActivePlayer;
-  const resolution = round.currentResolution;
+  const resolution = round?.currentResolution ?? null;
+  const turnIndex = round?.turnIndex ?? -1;
+
+  // A fresh plate to guess — every client sees this the moment the server
+  // moves on, whether or not it was this phone's tap that triggered it.
+  const lastRevealedTurn = useRef(-1);
+  useEffect(() => {
+    if (turnIndex === -1 || turnIndex === lastRevealedTurn.current) return;
+    lastRevealedTurn.current = turnIndex;
+    sound.playSfx('reveal');
+  }, [turnIndex]);
+
+  // Resolution arrives once per turn; dedupe so a re-render with the same
+  // resolution object (or a re-send from the server) doesn't replay it.
+  const resolvedTurns = useRef(new Set<number>());
+  useEffect(() => {
+    if (!resolution || turnIndex === -1 || resolvedTurns.current.has(turnIndex)) return;
+    resolvedTurns.current.add(turnIndex);
+    sound.playSfx(resolution.outcome === 'GUESSED' ? 'correct' : 'wrong');
+  }, [resolution, turnIndex]);
+
+  if (!round) return null;
 
   return (
     <div className="stack">
@@ -157,6 +194,7 @@ export function Guessing({ pub, priv }: { pub: PublicRoom; priv: PrivateState })
                 : 'Nobody got it.'}
             </div>
             <div className="ownercard">
+              <Paperclip />
               <div className="label">Your Owner card was</div>
               <div className="value">{resolution.ownerCardTitle}</div>
             </div>
@@ -232,6 +270,9 @@ export function Guessing({ pub, priv }: { pub: PublicRoom; priv: PrivateState })
 
 // ------------------------------------------------------------------ RoundEnd
 export function RoundEnd({ pub, priv }: { pub: PublicRoom; priv: PrivateState }) {
+  useEffect(() => {
+    sound.playSfx('round-end');
+  }, []);
   return (
     <div className="stack">
       <div className="card stack center-text">
@@ -258,9 +299,14 @@ export function RoundEnd({ pub, priv }: { pub: PublicRoom; priv: PrivateState })
 export function GameOver({ pub, priv }: { pub: PublicRoom; priv: PrivateState }) {
   const winners = pub.winnerPlayerIds.map((id) => nameOf(pub, id));
   const shared = winners.length > 1;
+  useEffect(() => {
+    sound.playSfx('game-over');
+    const t = setTimeout(() => sound.playSpeech('game-over'), 500);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <div className="stack">
-      <div className="card stack center-text">
+      <div className="card stack center-text gameover-card">
         <div className="title">GAME OVER</div>
         <div className="h2">
           {winners.length === 0
