@@ -15,7 +15,8 @@
     "dev:client": "npm run dev -w @vntypl8s/client",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
-    "gen:cards": "npm run gen:cards -w @vntypl8s/server --"
+    "gen:cards": "npm run gen:cards -w @vntypl8s/server --",
+    "bots": "npm run bots -w @vntypl8s/server --"
   },
   "devDependencies": {
     "concurrently": "^9.1.0",

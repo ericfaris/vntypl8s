@@ -168,10 +168,20 @@ function HostFlow({ onBack }: { onBack: () => void }) {
             : '📺 Cast to a TV'}
         </button>
       )}
-      <div className="notice small muted">
-        No Chromecast? Open <code>/receiver.html?dev&amp;code={code}</code> on any screen —
-        it needs a cast token, see the README.
-      </div>
+      {cast.receiverDevUrl ? (
+        <a
+          className="notice small"
+          href={cast.receiverDevUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          ⧉ Open the TV view in a browser tab (dev preview)
+        </a>
+      ) : (
+        <div className="notice small muted">
+          No Chromecast? Open <code>/receiver.html?dev</code> on any screen once a room is up.
+        </div>
+      )}
       <input
         value={name}
         placeholder="Your name"
@@ -246,7 +256,13 @@ function InGame() {
       {!g.connected && <div className="banner">Reconnecting…</div>}
       {g.error && <ErrorBanner message={g.error} />}
       {pub.phase === 'LOBBY' && (
-        <Lobby pub={pub} priv={priv} castState={cast.state} onCast={cast.requestSession} />
+        <Lobby
+          pub={pub}
+          priv={priv}
+          castState={cast.state}
+          onCast={cast.requestSession}
+          devUrl={cast.receiverDevUrl}
+        />
       )}
       {pub.phase === 'WRITE_PLATES' && <WritePlates pub={pub} priv={priv} />}
       {pub.phase === 'GUESSING' && <Guessing pub={pub} priv={priv} />}

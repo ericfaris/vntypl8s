@@ -1,0 +1,16 @@
+{
+  "name": "VNTYPL8S",
+  "short_name": "VNTYPL8S",
+  "description": "The vanity-plate party game — write a plate, guess the others.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#10141c",
+  "theme_color": "#10141c",
+  "icons": [
+    { "src": "/brand/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

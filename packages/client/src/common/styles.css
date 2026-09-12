@@ -7,7 +7,6 @@
   --bg: #10141c;
   --bg-2: #1a2130;
   --panel: #1e2635;
-  --panel-2: #27314400;
   --text: #eef2f8;
   --muted: #93a0b5;
   --line: #3a465c;
@@ -164,6 +163,15 @@ input:focus {
   background: #141b27;
   border: 2px dashed var(--line);
 }
+a.notice {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  color: var(--accent);
+}
+a.notice:hover {
+  border-color: var(--accent);
+}
 .code-big {
   font-family: var(--font-plate);
   font-size: 3rem;
@@ -269,6 +277,7 @@ input:focus {
   display: inline-flex;
   gap: 6px;
   align-items: baseline;
+  font-variant-numeric: tabular-nums;
 }
 
 .ownercard {
@@ -335,6 +344,7 @@ input:focus {
   border-radius: 10px;
   background: #182031;
   border: 2px solid var(--line);
+  font-variant-numeric: tabular-nums;
 }
 .standing.winner {
   border-color: var(--accent);

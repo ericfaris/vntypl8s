@@ -4,6 +4,12 @@ import react from '@vitejs/plugin-react';
 
 // Two builds from one codebase: the player UI (index.html) and the TV
 // receiver UI (receiver.html).
+// Ports are overridable so the dev stack can dodge a busy 3001 / 5173:
+//   PORT=4567 CLIENT_PORT=4568 npm run dev
+// PORT is the server's (it reads the same var); the client proxies to it.
+const API_PORT = process.env.PORT ?? '3001';
+const CLIENT_PORT = Number(process.env.CLIENT_PORT ?? 5173);
+
 export default defineConfig({
   plugins: [react()],
   resolve: {
@@ -20,13 +26,13 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173,
+    port: CLIENT_PORT,
     // Bind 0.0.0.0: a Chromecast is a separate LAN device and cannot resolve
     // this machine's `localhost` (Chromecast guide §6).
     host: true,
     proxy: {
-      '/socket': { target: 'http://localhost:3001', ws: true },
-      '/api': { target: 'http://localhost:3001' },
+      '/socket': { target: `http://localhost:${API_PORT}`, ws: true },
+      '/api': { target: `http://localhost:${API_PORT}` },
     },
   },
 });

@@ -30,10 +30,11 @@ then join from another tab or phone.
 |---|---|
 | `npm install` | Install all three workspaces |
 | `npm run build` | shared → client → server, in that order |
-| `npm run dev` | `concurrently` runs the tsx server watcher + Vite |
+| `npm run dev` | `concurrently` runs the tsx server watcher + Vite (`PORT` / `CLIENT_PORT` override 3001 / 5173) |
 | `npm run typecheck` | `tsc --noEmit` across all workspaces |
 | `npm test` | vitest across all workspaces |
 | `npm run gen:cards` | **Offline** one-time card generation (see below) |
+| `npm run bots` | Fill a lobby with bot players to play against (see below) |
 
 `GET /api/health` returns `{ ok, version, rooms }`.
 
@@ -87,11 +88,20 @@ before shipping**; namespace drift is a silent, hard-to-debug failure.
 
 ### Developing the receiver without a device
 
+In a dev build, the host screen and the in-game lobby show a **"⧉ Open the TV
+view in a browser tab (dev preview)"** link once a room exists. It opens
+
 ```
-http://localhost:5173/receiver.html?dev&code=<code>&token=<token>
+/receiver.html?dev&code=<code>&token=<token>
 ```
 
-`?dev` skips `window.cast` entirely and subscribes directly. Get a token with:
+with a fresh standalone cast token already filled in (minted by the shared
+Cast hook via `POST /api/cast/token`, independent of any real Cast session).
+`?dev` skips `window.cast` entirely and subscribes directly, so the TV view
+renders in a normal browser tab with no Chromecast in the room. The link is
+gated on `import.meta.env.DEV` and never ships to production.
+
+To build the URL by hand, get a token with:
 
 ```bash
 curl -s -X POST localhost:3001/api/cast/token \
@@ -125,6 +135,52 @@ Chrome and silently no-ops on the device. Review this file by reading it.
 
 ---
 
+## Playing against bots
+
+`npm run bots` fills a lobby with bot players so you can play a real game
+solo — your phone in one browser, the TV receiver (`?dev`) in another, three
+bots making up the numbers. The bots are ordinary socket clients speaking the
+same wire protocol as the phone app; they are not an engine shortcut.
+
+```bash
+npm run dev                       # server + Vite, in one terminal
+npm run bots                      # in a second terminal
+```
+
+If ports 3001 / 5173 are already taken on your machine, run the whole stack
+elsewhere — the client proxies to whatever `PORT` you give the server:
+
+```bash
+PORT=4567 CLIENT_PORT=4568 PUBLIC_BASE_URL=http://localhost:4568 npm run dev
+npm run bots -- --server http://localhost:4567
+```
+
+**Host mode** (default, no code given): the bots create the room, print the
+join URL + the `?dev` TV URL (with a token filled in), then wait. Open the
+phone URL, join, and once you're in the lobby the bots start the game and
+advance the rounds themselves. You just play. Single-key commands while it
+runs: `s` start now · `n` force next round · `r` rematch · `q` quit.
+
+```bash
+npm run bots -- 4821              # join mode: bots join room 4821 that YOU
+                                  #   hosted — you drive Start / Next round
+npm run bots -- --n 2             # 2 bots instead of 3
+npm run bots -- --solo            # host mode, start without waiting for a human
+npm run bots -- --server http://192.168.1.42:3001
+```
+
+Bot behaviour: writes a legal plate each round (satisfies its Requirements
+card ~80% of the time, so both scoring paths get exercised); when a bot is the
+Active Player it waits a few seconds, then awards a random player (weighted
+toward humans) or "nobody", and advances. When *you're* the Active Player,
+the bots stay out of it — you award in your browser as normal.
+
+If you changed anything in `packages/shared`, run
+`npm run build -w @vntypl8s/shared` first — the script imports its built
+`dist`, same as the server does.
+
+---
+
 ## Assets
 
 `packages/client/public/brand/` and `packages/client/public/audio/` hold the
@@ -133,15 +189,23 @@ static files, the same pattern as the curated card decks above:
 
 - `brand/logo.png` — the chrome VNTYPL8S wordmark badge (player app header,
   TV lobby/idle screens, and the source for `favicon.ico`).
-- `brand/bg-lobby.jpg`, `brand/bg-gameover.jpg` — full-bleed TV backgrounds
-  for the receiver's lobby and game-over screens.
+- `brand/icon-192.png`, `brand/icon-512.png`, `brand/apple-touch-icon.png` —
+  PWA / home-screen icons (the plate badge on the dark ground), wired up by
+  `public/manifest.webmanifest` and the `<link>` tags in `index.html`.
+- `brand/bg-lobby.jpg`, `brand/bg-round.jpg`, `brand/bg-gameover.jpg` —
+  1280×720 full-bleed TV backgrounds for the receiver's lobby, play
+  (writing / guessing / round recap) and game-over screens. Each is paired
+  with an `rgba(16,20,28,·)` gradient scrim; `bg-round` is darker because the
+  play screens are dense with text.
 - `audio/sfx/*.mp3` — short UI sounds (tile tap, plate submit, reveal,
-  correct/wrong guess, timer tick, round-end and game-over fanfares), played
-  from `packages/client/src/common/sound.ts` and muted per-device via the
-  🔊/🔇 button (`localStorage`, never game state).
-- `audio/speech/*.mp3` — four pre-recorded announcer lines (round 1/2/3 start,
-  game over). Static and generic by design — no player names — so they don't
-  need runtime generation.
+  correct/wrong guess, timer tick, last-3-seconds countdown, round-end and
+  game-over fanfares, player-join chime, back/cancel blip, sticker peel),
+  played from `packages/client/src/common/sound.ts` and muted per-device via
+  the 🔊/🔇 button (`localStorage`, never game state).
+- `audio/speech/*.mp3` — pre-recorded game-show-announcer lines (round 1/2/3
+  start, welcome/lobby, first-plate reveal, single-winner, tie, game over).
+  Static and generic by design — no player names — so they don't need runtime
+  generation. Voiced with ElevenLabs "Ed – Late Night Announcer".
 
 The TV receiver stays silent by design (see the CAF boot block in
 `receiver.html`): all sound lives in the player app, since every effect here
@@ -151,6 +215,11 @@ moments after one), which is what satisfies browser autoplay policies.
 The bumper-sticker flourishes on the landing/lobby screen
 (`packages/client/src/common/stickers.tsx`) are hand-authored inline SVG, not
 generated images — cheap, crisp at any size, and an easy place to add more.
+
+The full visual/audio/interaction language — color tokens, typography, the
+phone-vs-TV split, component rules, motion, sound layering — is written up in
+[`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md). Read it before adding a
+screen or an asset.
 
 ---
 

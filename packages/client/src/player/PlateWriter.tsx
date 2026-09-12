@@ -48,6 +48,7 @@ export function PlateWriter({ priv }: { priv: PrivateState }) {
     void store.setPlate(next);
   }
   function clear() {
+    sound.playSfx('back');
     setPlate('');
     void store.setPlate('');
   }

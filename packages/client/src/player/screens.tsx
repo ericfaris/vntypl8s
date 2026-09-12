@@ -40,15 +40,35 @@ export function Lobby({
   priv,
   castState,
   onCast,
+  devUrl,
 }: {
   pub: PublicRoom;
   priv: PrivateState;
   /** From the Cast controller. 'unavailable' hides the button entirely. */
   castState?: string;
   onCast?: () => void;
+  /** Dev-only browser preview of the receiver (guide §6). */
+  devUrl?: string | null;
 }) {
   const active = pub.players.filter((p) => !p.pendingJoin && p.connected);
   const canStart = active.length >= MIN_PLAYERS && active.length <= MAX_PLAYERS;
+
+  // Announce the game once, when this phone first lands in the lobby.
+  useEffect(() => {
+    sound.playSpeech('welcome');
+  }, []);
+
+  // A little chime whenever the roster grows — skipped on the first render so
+  // arriving to a lobby that already has people in it stays quiet.
+  const seenCount = useRef<number | null>(null);
+  const roster = pub.players.length;
+  useEffect(() => {
+    if (seenCount.current !== null && roster > seenCount.current) {
+      sound.playSfx('player-join');
+    }
+    seenCount.current = roster;
+  }, [roster]);
+
   return (
     <div className="stack">
       <div className="card stack center-text stickerfield">
@@ -84,6 +104,11 @@ export function Lobby({
             Start game
           </button>
         </>
+      )}
+      {devUrl && (
+        <a className="notice small" href={devUrl} target="_blank" rel="noopener noreferrer">
+          ⧉ Open the TV view in a browser tab (dev preview)
+        </a>
       )}
       {!priv.isHost && <div className="muted center-text">Waiting for the host to start…</div>}
     </div>
@@ -158,6 +183,9 @@ export function Guessing({ pub, priv }: { pub: PublicRoom; priv: PrivateState })
     if (turnIndex === -1 || turnIndex === lastRevealedTurn.current) return;
     lastRevealedTurn.current = turnIndex;
     sound.playSfx('reveal');
+    // The announcer only chimes in on the first plate of the round, so the
+    // remaining reveals stay brisk.
+    if (turnIndex === 0) sound.playSpeech('reveal');
   }, [turnIndex]);
 
   // Resolution arrives once per turn; dedupe so a re-render with the same
@@ -166,7 +194,10 @@ export function Guessing({ pub, priv }: { pub: PublicRoom; priv: PrivateState })
   useEffect(() => {
     if (!resolution || turnIndex === -1 || resolvedTurns.current.has(turnIndex)) return;
     resolvedTurns.current.add(turnIndex);
-    sound.playSfx(resolution.outcome === 'GUESSED' ? 'correct' : 'wrong');
+    // Peel the sticker off (the Owner card is revealed now), then land the
+    // outcome sting a beat later.
+    sound.playSfx('sticker-peel');
+    setTimeout(() => sound.playSfx(resolution.outcome === 'GUESSED' ? 'correct' : 'wrong'), 220);
   }, [resolution, turnIndex]);
 
   if (!round) return null;
@@ -301,7 +332,9 @@ export function GameOver({ pub, priv }: { pub: PublicRoom; priv: PrivateState })
   const shared = winners.length > 1;
   useEffect(() => {
     sound.playSfx('game-over');
-    const t = setTimeout(() => sound.playSpeech('game-over'), 500);
+    const line: SpeechName =
+      pub.winnerPlayerIds.length === 0 ? 'game-over' : shared ? 'tie' : 'winner';
+    const t = setTimeout(() => sound.playSpeech(line), 500);
     return () => clearTimeout(t);
   }, []);
   return (

@@ -28,6 +28,13 @@ export interface CastSync {
   requestSession(): void;
   endSession(): void;
   toggleDebug(): void;
+  /**
+   * Dev-only. A ready-to-open URL that boots the receiver in `?dev` stub mode
+   * (guide §6) already carrying the current room code and a fresh scoped
+   * token, so the TV view can be previewed in a plain browser tab with no
+   * Chromecast in the room. `null` until a room exists (or in a prod build).
+   */
+  receiverDevUrl: string | null;
 }
 
 interface Persisted {
@@ -76,6 +83,36 @@ export function useCastSync({
   const confirmedKeyRef = useRef<string | null>(null);
   const inFlightRef = useRef(false);
   const tokenRef = useRef<string | null>(null);
+
+  // Dev-only browser preview of the receiver (guide §6). Mint one standalone
+  // token per room — independent of any live Cast session — so the link works
+  // whether or not a Chromecast is around.
+  const [devToken, setDevToken] = useState<string | null>(null);
+  useEffect(() => {
+    if (!import.meta.env.DEV || !roomCode) {
+      setDevToken(null);
+      return;
+    }
+    let cancelled = false;
+    void fetch('/api/cast/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ code: roomCode }),
+    })
+      .then((r) => (r.ok ? (r.json() as Promise<{ token: string }>) : null))
+      .then((d) => {
+        if (!cancelled && d?.token) setDevToken(d.token);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [roomCode]);
+
+  const receiverDevUrl =
+    import.meta.env.DEV && roomCode && devToken
+      ? `/receiver.html?dev&code=${roomCode}&token=${encodeURIComponent(devToken)}`
+      : null;
 
   // Load the SDK lazily and upgrade from the no-op controller once it lands.
   useEffect(() => {
@@ -184,5 +221,5 @@ export function useCastSync({
     [controller],
   );
 
-  return { state, synced, requestSession, endSession, toggleDebug };
+  return { state, synced, requestSession, endSession, toggleDebug, receiverDevUrl };
 }

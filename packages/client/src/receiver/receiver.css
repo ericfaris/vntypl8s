@@ -17,6 +17,32 @@
    Chrome. Review by reading, not by looking.
    ========================================================================== */
 
+/* TV palette — the same values as the phone's tokens (see
+   docs/DESIGN_SYSTEM.md §2), redeclared here rather than shared: the two
+   stylesheets must never be merged (Chromecast guide §3.7). CSS custom
+   properties are Chrome 49+, so they are safe on real hardware. Keep this
+   block in sync with common/styles.css :root when a value changes. */
+:root {
+  --tv-bg: #10141c;
+  --tv-bg-2: #1a2130;
+  --tv-panel: #1e2635;
+  --tv-text: #eef2f8;
+  --tv-muted: #93a0b5;
+  --tv-line: #3a465c;
+  --tv-accent: #ffc233;
+  --tv-good: #3fbf72;
+  --tv-warn: #ffb020;
+  --tv-bad: #e0554b;
+  --tv-plate-bg: #f4f3ee;
+  --tv-plate-ink: #16202e;
+  --tv-plate-edge: #0d1420;
+  --tv-plate-dim: #b9b6ab;
+  /* Brighter than --tv-text, for the couple of glanceable headline numbers
+     (room code, live timer). */
+  --tv-hi: #ffffff;
+  --tv-font-mono: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+}
+
 html,
 body,
 #root {
@@ -26,9 +52,9 @@ body,
 }
 
 body {
-  background-color: #10141c;
-  background-image: linear-gradient(180deg, #1a2130 0%, #10141c 100%);
-  color: #eef2f8;
+  background-color: var(--tv-bg);
+  background-image: linear-gradient(180deg, var(--tv-bg-2) 0%, var(--tv-bg) 100%);
+  color: var(--tv-text);
   font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
@@ -77,7 +103,7 @@ body {
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #ffc233;
+  color: var(--tv-accent);
 }
 
 .tv-logo {
@@ -103,8 +129,18 @@ body {
   background-position: center;
 }
 
+/* Behind the play screens (writing / guessing / round recap). Heavier scrim
+   than the lobby — these screens are dense with text — so the art reads as a
+   faint horizon rather than competing with the scoreboard. */
+.tv-round-bg {
+  background-image: linear-gradient(180deg, rgba(16, 20, 28, 0.82) 0%, rgba(16, 20, 28, 0.9) 100%),
+    url("/brand/bg-round.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
 .tv-muted {
-  color: #93a0b5;
+  color: var(--tv-muted);
   font-size: 1.8vw;
 }
 
@@ -113,24 +149,25 @@ body {
 }
 
 .tv-error {
-  color: #e0554b;
+  color: var(--tv-bad);
   font-size: 1.4vw;
   margin-top: 2vh;
 }
 
 .tv-code {
-  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  font-family: var(--tv-font-mono);
   font-size: 9vw;
   font-weight: 800;
   letter-spacing: 0.12em;
-  color: #ffffff;
+  color: var(--tv-hi);
+  font-variant-numeric: tabular-nums;
 }
 
 .tv-qr {
   background-color: #ffffff;
   padding: 1vw;
   border-radius: 1vw;
-  border: 0.3vw solid #0d1420;
+  border: 0.3vw solid var(--tv-plate-edge);
 }
 .tv-qr img {
   display: block;
@@ -150,18 +187,19 @@ body {
   padding-left: 1.4vw;
   padding-right: 1.4vw;
   border-radius: 4vw;
-  border: 0.2vw solid #3a465c;
-  background-color: #1e2635;
+  border: 0.2vw solid var(--tv-line);
+  background-color: var(--tv-panel);
 }
 
 /* -------------------------------- writing phase ------------------------- */
 .tv-timer {
   font-size: 5vw;
   font-weight: 800;
-  color: #ffffff;
+  color: var(--tv-hi);
+  font-variant-numeric: tabular-nums;
 }
 .tv-timer.warn {
-  color: #ffb020;
+  color: var(--tv-warn);
 }
 
 .tv-writegrid {
@@ -179,11 +217,11 @@ body {
   padding-left: 2vw;
   padding-right: 2vw;
   border-radius: 1vw;
-  border: 0.2vw solid #3a465c;
-  background-color: #1a2130;
+  border: 0.2vw solid var(--tv-line);
+  background-color: var(--tv-bg-2);
 }
 .tv-writerow.done {
-  border-color: #3fbf72;
+  border-color: var(--tv-good);
 }
 .tv-writename {
   font-size: 2.2vw;
@@ -192,7 +230,7 @@ body {
 }
 .tv-writestatus {
   font-size: 1.6vw;
-  color: #93a0b5;
+  color: var(--tv-muted);
   width: 20%;
   text-align: right;
 }
@@ -205,12 +243,12 @@ body {
   width: 1.4vw;
   height: 1.4vw;
   border-radius: 1vw;
-  border: 0.2vw solid #3a465c;
+  border: 0.2vw solid var(--tv-line);
   background-color: transparent;
 }
 .tv-dot.on {
-  background-color: #ffc233;
-  border-color: #ffc233;
+  background-color: var(--tv-accent);
+  border-color: var(--tv-accent);
 }
 
 /* -------------------------------- guessing ------------------------------ */
@@ -221,8 +259,8 @@ body {
 
 .tv-plate {
   display: inline-block;
-  background-color: #f4f3ee;
-  border: 0.4vw solid #0d1420;
+  background-color: var(--tv-plate-bg);
+  border: 0.4vw solid var(--tv-plate-edge);
   border-radius: 1vw;
   padding-top: 1.2vh;
   padding-bottom: 1.2vh;
@@ -234,36 +272,36 @@ body {
   gap: 0.5vw;
 }
 .tv-plate-char {
-  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  font-family: var(--tv-font-mono);
   font-size: 7vw;
   font-weight: 800;
-  color: #16202e;
+  color: var(--tv-plate-ink);
   line-height: 1.05;
 }
 .tv-plate-char.dim {
-  color: #b9b6ab;
+  color: var(--tv-plate-dim);
 }
 
 .tv-prompt {
   text-align: center;
   font-size: 2vw;
-  color: #93a0b5;
+  color: var(--tv-muted);
 }
 
 .tv-reveal {
   text-align: center;
-  border: 0.25vw solid #ffc233;
+  border: 0.25vw solid var(--tv-accent);
   border-radius: 1vw;
   padding-top: 1.2vh;
   padding-bottom: 1.2vh;
   padding-left: 2vw;
   padding-right: 2vw;
-  background-color: #21283a;
+  background-color: var(--tv-panel);
 }
 .tv-reveal-title {
   font-size: 2.6vw;
   font-weight: 800;
-  color: #ffc233;
+  color: var(--tv-accent);
 }
 .tv-reveal-card {
   font-size: 3.4vw;
@@ -271,7 +309,7 @@ body {
 }
 .tv-reveal-sub {
   font-size: 1.5vw;
-  color: #93a0b5;
+  color: var(--tv-muted);
 }
 
 .tv-grid {
@@ -292,12 +330,12 @@ body {
   padding-left: 0.6vw;
   padding-right: 0.6vw;
   border-radius: 0.8vw;
-  border: 0.2vw solid #3a465c;
-  background-color: #1e2635;
+  border: 0.2vw solid var(--tv-line);
+  background-color: var(--tv-panel);
 }
 .tv-card.scored {
   opacity: 0.35;
-  border-color: #3fbf72;
+  border-color: var(--tv-good);
   text-decoration: line-through;
 }
 .tv-card.discarded {
@@ -319,26 +357,27 @@ body {
   padding-left: 1vw;
   padding-right: 1vw;
   border-radius: 0.8vw;
-  border: 0.2vw solid #3a465c;
-  background-color: #1a2130;
+  border: 0.2vw solid var(--tv-line);
+  background-color: var(--tv-bg-2);
 }
 .tv-score.active {
-  border-color: #ffc233;
+  border-color: var(--tv-accent);
 }
 .tv-score-name {
   display: block;
   font-size: 1.5vw;
-  color: #93a0b5;
+  color: var(--tv-muted);
 }
 .tv-score-total {
   display: block;
   font-size: 3vw;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 .tv-score-sub {
   display: block;
   font-size: 1.1vw;
-  color: #93a0b5;
+  color: var(--tv-muted);
 }
 
 /* -------------------------------- recap --------------------------------- */
@@ -358,19 +397,19 @@ body {
   padding-left: 1.5vw;
   padding-right: 1.5vw;
   border-radius: 0.8vw;
-  background-color: #1a2130;
+  background-color: var(--tv-bg-2);
 }
 .tv-recapname {
   font-weight: 700;
   width: 30%;
 }
 .tv-recapcard {
-  color: #ffc233;
+  color: var(--tv-accent);
   width: 40%;
   text-align: center;
 }
 .tv-recapwho {
-  color: #93a0b5;
+  color: var(--tv-muted);
   width: 30%;
   text-align: right;
 }
@@ -381,7 +420,7 @@ body {
   bottom: 1vh;
   right: 1vw;
   font-size: 1vw;
-  color: #93a0b5;
+  color: var(--tv-muted);
   opacity: 0.5;
 }
 
@@ -394,7 +433,7 @@ body {
   overflow: hidden;
   background-color: rgba(0, 0, 0, 0.82);
   color: #d8f0d8;
-  font-family: "DejaVu Sans Mono", Menlo, Consolas, monospace;
+  font-family: var(--tv-font-mono);
   font-size: 1.1vw;
   padding-top: 0.5vh;
   padding-bottom: 0.5vh;

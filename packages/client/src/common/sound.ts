@@ -17,10 +17,23 @@ export type SfxName =
   | 'correct'
   | 'wrong'
   | 'timer-tick'
+  | 'countdown'
   | 'round-end'
-  | 'game-over';
+  | 'game-over'
+  | 'player-join'
+  | 'back'
+  | 'sticker-peel';
 
-export type SpeechName = 'round1' | 'round2' | 'round3' | 'game-over';
+export type SpeechName =
+  | 'round1'
+  | 'round2'
+  | 'round3'
+  | 'game-over'
+  | 'welcome'
+  | 'reveal'
+  | 'correct'
+  | 'winner'
+  | 'tie';
 
 const SFX_FILES: Record<SfxName, string> = {
   'tile-tap': '/audio/sfx/tile-tap.mp3',
@@ -29,8 +42,12 @@ const SFX_FILES: Record<SfxName, string> = {
   correct: '/audio/sfx/correct.mp3',
   wrong: '/audio/sfx/wrong.mp3',
   'timer-tick': '/audio/sfx/timer-tick.mp3',
+  countdown: '/audio/sfx/countdown.mp3',
   'round-end': '/audio/sfx/round-end.mp3',
   'game-over': '/audio/sfx/game-over.mp3',
+  'player-join': '/audio/sfx/player-join.mp3',
+  back: '/audio/sfx/back.mp3',
+  'sticker-peel': '/audio/sfx/sticker-peel.mp3',
 };
 
 const SPEECH_FILES: Record<SpeechName, string> = {
@@ -38,6 +55,11 @@ const SPEECH_FILES: Record<SpeechName, string> = {
   round2: '/audio/speech/round2.mp3',
   round3: '/audio/speech/round3.mp3',
   'game-over': '/audio/speech/game-over.mp3',
+  welcome: '/audio/speech/welcome.mp3',
+  reveal: '/audio/speech/reveal.mp3',
+  correct: '/audio/speech/correct.mp3',
+  winner: '/audio/speech/winner.mp3',
+  tie: '/audio/speech/tie.mp3',
 };
 
 const LS_MUTED = 'vp:muted';

@@ -10,7 +10,8 @@
     "start": "node dist/index.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "gen:cards": "tsx src/scripts/generate-cards.ts"
+    "gen:cards": "tsx src/scripts/generate-cards.ts",
+    "bots": "tsx src/scripts/bots.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.68.0",

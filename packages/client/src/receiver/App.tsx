@@ -185,7 +185,7 @@ function LobbyTV({ pub, baseUrl }: { pub: PublicRoom; baseUrl: string }) {
 function WriteTV({ pub, offset }: { pub: PublicRoom; offset: number }) {
   const players = pub.players.filter((p) => !p.pendingJoin);
   return (
-    <div className="tv">
+    <div className="tv tv-round-bg">
       <div className="tv-spread">
         <div className="tv-brand">
           Round {pub.round?.roundNumber ?? 1} of {pub.totalRounds} · Writing plates
@@ -236,7 +236,7 @@ function ResolutionBanner({ pub, res }: { pub: PublicRoom; res: PublicTurnResolu
 function GuessingTV({ pub }: { pub: PublicRoom }) {
   const round = pub.round!;
   return (
-    <div className="tv">
+    <div className="tv tv-round-bg">
       <div className="tv-spread">
         <div className="tv-brand">
           Round {round.roundNumber} of {pub.totalRounds} · Plate {round.turnIndex + 1} of{' '}
@@ -271,7 +271,7 @@ function GuessingTV({ pub }: { pub: PublicRoom }) {
 function RoundEndTV({ pub }: { pub: PublicRoom }) {
   const round = pub.round!;
   return (
-    <div className="tv">
+    <div className="tv tv-round-bg">
       <div className="tv-brand">
         End of round {round.roundNumber} of {pub.totalRounds}
       </div>

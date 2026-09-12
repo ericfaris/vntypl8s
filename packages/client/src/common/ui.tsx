@@ -33,7 +33,9 @@ export function Timer({
     if (!tick || remaining === null) return;
     if (remaining > 0 && remaining <= 5 && lastTicked.current !== remaining) {
       lastTicked.current = remaining;
-      sound.playSfx('timer-tick');
+      // The final three seconds get the sharper countdown blip; 5s and 4s
+      // keep the softer tick so the escalation is audible.
+      sound.playSfx(remaining <= 3 ? 'countdown' : 'timer-tick');
     }
   }, [tick, remaining]);
 
