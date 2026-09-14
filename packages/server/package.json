@@ -14,7 +14,7 @@
     "bots": "tsx src/scripts/bots.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.68.0",
+    "@anthropic-ai/sdk": "^0.125.0",
     "@vntypl8s/shared": "*",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
