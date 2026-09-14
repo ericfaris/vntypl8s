@@ -217,9 +217,13 @@ The bumper-sticker flourishes on the landing/lobby screen
 generated images — cheap, crisp at any size, and an easy place to add more.
 
 The full visual/audio/interaction language — color tokens, typography, the
-phone-vs-TV split, component rules, motion, sound layering — is written up in
-[`docs/DESIGN_SYSTEM.md`](docs/DESIGN_SYSTEM.md). Read it before adding a
-screen or an asset.
+phone-vs-TV split, component rules, motion, sound layering, contrast notes,
+and the full asset inventory — is written up in [`DESIGN.md`](DESIGN.md) at
+the repo root (`docs/DESIGN_SYSTEM.md` is the original, now-superseded
+version). Read it before adding a screen or an asset. A live showcase
+rendering every token and component from the real CSS is at
+`packages/client/design-system.html` (`/design-system.html` once the app is
+running).
 
 ---
 

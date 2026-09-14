@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VNTYPL8S — TV component showcase</title>
+    <style>
+      /* Page-chrome only — never a restated component rule. Every box below
+         with a .tv-* class is styled entirely by receiver.css. */
+      body {
+        overflow: auto !important;
+        height: auto !important;
+        padding: 24px;
+      }
+      .showcase-section {
+        max-width: 1100px;
+        margin: 0 auto 40px;
+      }
+      .showcase-h {
+        color: var(--tv-accent);
+        font-size: 14px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin: 0 0 12px;
+        font-family: system-ui, sans-serif;
+      }
+      .tv-frame {
+        border: 1px solid var(--tv-line);
+        border-radius: 8px;
+        padding: 24px;
+        margin-bottom: 16px;
+        background: var(--tv-bg-2);
+      }
+      .swatch-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 10px;
+      }
+      .swatch {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid var(--tv-line);
+        border-radius: 8px;
+        padding: 8px;
+        background: var(--tv-panel);
+      }
+      .swatch-color {
+        width: 40px;
+        height: 40px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        flex: none;
+      }
+      .swatch-meta {
+        display: flex;
+        flex-direction: column;
+        font-family: system-ui, sans-serif;
+        font-size: 11px;
+        line-height: 1.4;
+        min-width: 0;
+      }
+      .swatch-meta code {
+        font-size: 12px;
+        color: var(--tv-hi);
+      }
+      .swatch-value {
+        font-family: var(--tv-font-mono);
+      }
+      .swatch-role {
+        color: var(--tv-muted);
+      }
+      .type-meta,
+      .box-meta {
+        font-family: system-ui, sans-serif;
+        font-size: 12px;
+        color: var(--tv-muted);
+        margin-top: 4px;
+      }
+      .bg-thumb {
+        width: 100%;
+        max-width: 320px;
+        aspect-ratio: 16/9;
+        border-radius: 6px;
+        border: 1px solid var(--tv-line);
+      }
+      .row-wrap {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="showcase-section">
+      <h1 class="showcase-h">TV token palette (receiver.css :root, live values)</h1>
+      <div class="swatch-row" id="tv-swatches"></div>
+    </section>
+
+    <section class="showcase-section">
+      <h1 class="showcase-h">Brand + type</h1>
+      <div class="tv-frame">
+        <div class="tv-brand" data-type-sample=".tv-brand">VNTYPL8S</div>
+        <div class="type-meta"></div>
+        <br />
+        <div class="tv-code" data-type-sample=".tv-code">7F4K</div>
+        <div class="type-meta"></div>
+        <br />
+        <div class="tv-muted" data-type-sample=".tv-muted">vntypl8s.example.com/join</div>
+        <div class="type-meta"></div>
+      </div>
+    </section>
+
+    <section class="showcase-section">
+      <h1 class="showcase-h">Backgrounds (full-bleed art + scrim)</h1>
+      <div class="row-wrap">
+        <div class="tv-lobby-bg bg-thumb"></div>
+        <div class="tv-round-bg bg-thumb"></div>
+        <div class="tv-gameover-bg bg-thumb"></div>
+      </div>
+    </section>
+
+    <section class="showcase-section">
+      <h1 class="showcase-h">Player chips + score board</h1>
+      <div class="tv-frame">
+        <div class="tv-players">
+          <span class="tv-pchip">Dana</span>
+          <span class="tv-pchip">Rae</span>
+          <span class="tv-pchip">Milo</span>
+        </div>
+        <br />
+        <div class="tv-scores">
+          <div class="tv-score active">
+            <span class="tv-score-name">Dana</span>
+            <span class="tv-score-total">14</span>
+            <span class="tv-score-sub">9o · 5r</span>
+          </div>
+          <div class="tv-score">
+            <span class="tv-score-name">Rae</span>
+            <span class="tv-score-total">11</span>
+            <span class="tv-score-sub">6o · 5r</span>
+          </div>
+          <div class="tv-score">
+            <span class="tv-score-name">Milo</span>
+            <span class="tv-score-total">8</span>
+            <span class="tv-score-sub">4o · 4r</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section">
+      <h1 class="showcase-h">Writing phase — timer + write grid</h1>
+      <div class="tv-frame">
+        <div class="tv-timer">42s</div>
+        <br />
+        <div class="tv-writegrid">
+          <div class="tv-writerow done">
+            <span class="tv-writename">Dana</span>
+            <span class="tv-dots">
+              <span class="tv-dot on"></span><span class="tv-dot on"></span
+              ><span class="tv-dot on"></span><span class="tv-dot on"></span>
+            </span>
+            <span class="tv-writestatus">Locked in</span>
+          </div>
+          <div class="tv-writerow">
+            <span class="tv-writename">Rae</span>
+            <span class="tv-dots">
+              <span class="tv-dot on" data-demo></span><span class="tv-dot" data-demo></span
+              ><span class="tv-dot" data-demo></span><span class="tv-dot" data-demo></span>
+            </span>
+            <span class="tv-writestatus">Writing…</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section">
+      <h1 class="showcase-h">Plate + reveal + card grid</h1>
+      <div class="tv-frame">
+        <div class="tv-center-block">
+          <div class="tv-plate">
+            <div class="tv-plate-inner">
+              <span class="tv-plate-char">P</span><span class="tv-plate-char">A</span
+              ><span class="tv-plate-char">R</span><span class="tv-plate-char dim">K</span>
+            </div>
+          </div>
+        </div>
+        <br />
+        <div class="tv-reveal">
+          <div class="tv-reveal-title">It was...</div>
+          <div class="tv-reveal-card">Park Ranger</div>
+          <div class="tv-reveal-sub">written by Dana</div>
+        </div>
+        <br />
+        <div class="tv-grid">
+          <div class="tv-card">Astronaut</div>
+          <div class="tv-card scored">Park Ranger</div>
+          <div class="tv-card discarded">Mail Carrier</div>
+          <div class="tv-card">DJ</div>
+          <div class="tv-card">Beekeeper</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="showcase-section">
+      <h1 class="showcase-h">Round recap</h1>
+      <div class="tv-frame">
+        <div class="tv-recap">
+          <div class="tv-recaprow">
+            <span class="tv-recapname">Dana</span>
+            <span class="tv-recapcard">Park Ranger</span>
+            <span class="tv-recapwho">guessed by Rae</span>
+          </div>
+          <div class="tv-recaprow">
+            <span class="tv-recapname">Rae</span>
+            <span class="tv-recapcard">Astronaut</span>
+            <span class="tv-recapwho">guessed by Milo</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <script type="module" src="/src/design-system/tv-main.ts"></script>
+  </body>
+</html>

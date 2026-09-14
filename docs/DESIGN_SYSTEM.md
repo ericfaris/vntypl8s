@@ -1,5 +1,12 @@
 # VNTYPL8S Design System
 
+> **Superseded as the primary reference by [`/DESIGN.md`](../DESIGN.md)** at
+> the repo root, which folds this document's tables into a fuller narrative
+> (mood-board rationale, contrast ratios, the full asset inventory, and the
+> live showcase page). This file is kept as-is for its git history and as a
+> quick component/token lookup — the source of truth for values is still the
+> code either way.
+
 The visual, audio, and interaction language for VNTYPL8S. This is the
 reference for future design decisions — when adding a screen, a component, or
 an asset, match what is here rather than inventing a parallel style.
