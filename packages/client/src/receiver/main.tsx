@@ -1,6 +1,5 @@
 import './debug.js'; // MUST be first — captures boot-time errors
 import { createRoot } from 'react-dom/client';
-import '../common/styles.css';
 import './receiver.css';
 import App from './App.js';
 import { store } from '../common/store.js';
