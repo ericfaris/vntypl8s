@@ -56,7 +56,7 @@ A web app, played primarily on players' phones (as the "sender"/controller UI) w
 - Must follow `/home/eric/.claude/commands/chromecast.md` as house style for all Chromecast work — quote from it above; the planner and executor should both read this file directly before designing/building the Cast pieces.
 - Must mirror `pinpoint`'s architecture and conventions closely (it's the explicit reference implementation the user pointed at): npm workspaces (`packages/shared`, `packages/server`, `packages/client`), TypeScript throughout, Socket.io for real-time transport, Express server, Vite client build, Anthropic SDK (`@anthropic-ai/sdk`) for the one-time AI generation script, vitest for tests, Docker single-image build (see `pinpoint/Dockerfile` and `docker-compose.yml` for the exact pattern to replicate — build stage compiles shared→client→server, runtime stage runs `node packages/server/dist/index.js`), env vars loaded via a root `.env` (see `pinpoint/packages/server/src/env.ts`'s path-resolution approach), `ANTHROPIC_API_KEY`/`ANTHROPIC_MODEL`/`CAST_RECEIVER_APP_ID`/`PUBLIC_BASE_URL` as the env var shape to reuse.
 - Repo is currently empty except the rulebook PDF; this is a from-scratch build, not an existing-codebase feature addition.
-- Node v24.14.0 / npm 11.9.0 are the available toolchain on this machine (pinpoint's own Dockerfile uses `node:22-slim` for the build — planner can choose to match pinpoint's Docker node version even though the host has v24, since Docker is what actually ships).
+- Node v26.10.0 / npm 11.19.1 are the available toolchain on this machine (pinpoint's own Dockerfile uses `node:26-slim` for the build — planner can choose to match pinpoint's Docker node version even though the host has v26, since Docker is what actually ships).
 - No real Chromecast device access has been confirmed available for this session; real-hardware testing (guide §6's "register as Unpublished + whitelist device serial") may need to happen later with the user directly, or be deferred/flagged rather than claimed as verified.
 
 ## Acceptance criteria
@@ -104,5 +104,5 @@ A web app, played primarily on players' phones (as the "sender"/controller UI) w
   - `npm run dev` (root) → `concurrently` runs `dev:server` (`tsx watch src/index.ts`) and `dev:client` (Vite dev server)
   - `npm run typecheck` (root, `--workspaces --if-present`)
   - `npm test` (root, `--workspaces --if-present`, vitest per package)
-- Toolchain available on this host: Node v24.14.0, npm 11.9.0. No `pytest`/Python build tooling relevant to this project.
+- Toolchain available on this host: Node v26.10.0, npm 11.19.1. No `pytest`/Python build tooling relevant to this project.
 - No `ANTHROPIC_API_KEY` has been confirmed present in this environment yet for this new project — the one-time card-generation script will need a valid key to actually run; if none is available when the executor gets to that step, it should stop and report rather than fabricating card content without the API.
