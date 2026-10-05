@@ -201,10 +201,12 @@ describe('full round over WebSockets', () => {
       expect((await c.emit('plate:set', { plate })).ok).toBe(true);
       await tick();
       expect(c.priv?.requirementsMet).toBe(true);
-      // Nobody else's socket sees this plate text.
+      // Every other socket still sees only its OWN draft. (Comparing against
+      // this plate's text was flaky: two players can draw the same
+      // requirements card and so legitimately build identical plates.)
       for (const other of clients) {
         if (other === c) continue;
-        expect(other.priv?.plate).not.toBe(plate);
+        expect(other.priv?.plate).toBe(secrets.get(other.playerId)!.plate);
       }
       expect((await c.emit('plate:submit', {})).ok).toBe(true);
       await tick();

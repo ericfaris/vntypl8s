@@ -3,7 +3,10 @@ import { TOTAL_ROUNDS } from '@vntypl8s/shared';
 import { addPlayers, checkInvariants, makeEngine, playFullGame } from './harness.js';
 import { makeRng } from '../rng.js';
 
-describe('full-game simulations across many instances', () => {
+// Each case plays dozens of full games synchronously (~2-10s on the lab box).
+// Vitest 4 enforces the timeout on sync tests too (Vitest 2 didn't), so give
+// the whole suite an explicit budget instead of the 5s default.
+describe('full-game simulations across many instances', { timeout: 60_000 }, () => {
   for (const playerCount of [3, 4, 5, 6, 7, 8]) {
     it(`plays 25 seeded 3-round games with ${playerCount} players`, () => {
       for (let seed = 0; seed < 25; seed++) {
