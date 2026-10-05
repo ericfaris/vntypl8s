@@ -1,8 +1,7 @@
 # VNTYPL8S — single image: builds shared + client + server, runs the Node
 # server which serves the built client and the Socket.IO endpoint.
-# Stays on node:22-slim to match pinpoint even though the dev host runs 24 —
-# Docker is what actually ships.
-FROM node:22-slim AS build
+# Same node:26-slim base as pinpoint — Docker is what actually ships.
+FROM node:26-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY packages/shared/package.json packages/shared/
@@ -12,7 +11,7 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-FROM node:22-slim
+FROM node:26-slim
 RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV NODE_ENV=production
