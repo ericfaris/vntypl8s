@@ -19,7 +19,7 @@
     "bots": "npm run bots -w @vntypl8s/server --"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0",
+    "concurrently": "^10.0.0",
     "typescript": "^5.7.2"
   }
 }
