@@ -462,9 +462,7 @@ All sounds are auditioned inline on the showcase page (§8 there).
 | --- | --- |
 | `packages/client/public/favicon.ico` | browser tab icon |
 | `packages/client/public/brand/logo.png` | wordmark, phone header + TV brand |
-| `packages/client/public/brand/icon-192.png` | PWA icon (192×192) |
-| `packages/client/public/brand/icon-512.png` | PWA icon (512×512, also maskable) |
-| `packages/client/public/brand/apple-touch-icon.png` | iOS home-screen icon |
+| `packages/client/public/icon-192.png`, `icon-512.png`, `icon-maskable-512.png`, `apple-touch-icon.png` | App icon set, house standard (2026-10-16), from `scripts/icons/icon.svg` |
 | `packages/client/public/brand/bg-lobby.jpg` | TV lobby/join background |
 | `packages/client/public/brand/bg-round.jpg` | TV play-screen background |
 | `packages/client/public/brand/bg-gameover.jpg` | TV + phone game-over background |

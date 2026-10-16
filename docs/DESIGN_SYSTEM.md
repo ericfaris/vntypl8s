@@ -247,10 +247,15 @@ Rules:
 
 - **Wordmark:** `brand/logo.png` — chrome embossed "VNTYPL8S" plate badge.
   Used as the phone header (`.brand-logo`, 82% width) and the TV brand
-  (`.tv-logo`). Source of `favicon.ico` and the PWA icons.
-- **PWA icons:** `brand/icon-192.png`, `brand/icon-512.png` (also the maskable
-  512), `brand/apple-touch-icon.png` — the plate badge centered on the dark
-  ground, wired via `manifest.webmanifest`.
+  (`.tv-logo`).
+- **App icon (house standard, 2026-10-16):** shared with every mooseflip app
+  (modelled on redline and jambo): one bold, dimensional mark on a rich tile.
+  Here, an embossed "PL8S" vanity plate (bolts, `VNTYPL8S` header) tilted on a
+  road-trip blue glow. Master `scripts/icons/icon.svg`; `python3
+  scripts/icons/build.py` renders `public/favicon.ico` (16/32/48),
+  `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` and
+  `icon-maskable-512.png`, wired via `index.html` + `manifest.webmanifest`
+  (`src/icons.test.ts` guards it).
 - **TV backgrounds:** 1280×720 JPG, dark, muted teal/navy, generous empty sky
   for text, no lettering. `bg-lobby`, `bg-round` (darker — dense screens),
   `bg-gameover`. Always paired with an `rgba(16,20,28,·)` gradient scrim.
