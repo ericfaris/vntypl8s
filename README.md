@@ -188,10 +188,12 @@ game's visual and audio identity — one-time AI-generated assets shipped as
 static files, the same pattern as the curated card decks above:
 
 - `brand/logo.png` — the chrome VNTYPL8S wordmark badge (player app header,
-  TV lobby/idle screens, and the source for `favicon.ico`).
-- `brand/icon-192.png`, `brand/icon-512.png`, `brand/apple-touch-icon.png` —
-  PWA / home-screen icons (the plate badge on the dark ground), wired up by
-  `public/manifest.webmanifest` and the `<link>` tags in `index.html`.
+  TV lobby/idle screens).
+- App icons live at the public root (`favicon.ico`, `apple-touch-icon.png`,
+  `icon-192.png`, `icon-512.png`, `icon-maskable-512.png`): an embossed PL8S
+  plate on a blue glow, rendered from `scripts/icons/icon.svg` by
+  `python3 scripts/icons/build.py` and wired up by `public/manifest.webmanifest`
+  and the `<link>` tags in `index.html`.
 - `brand/bg-lobby.jpg`, `brand/bg-round.jpg`, `brand/bg-gameover.jpg` —
   1280×720 full-bleed TV backgrounds for the receiver's lobby, play
   (writing / guessing / round recap) and game-over screens. Each is paired
